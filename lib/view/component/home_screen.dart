@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           developer.log(
             'log me',
-            name: 'my.app.category',
+            // name: 'my.app.category',
             error: jsonDecode(data),
           );
           // stderr.writeIn('print');
@@ -117,6 +117,12 @@ class _HomeScreenState extends State<HomeScreen> {
             FilledButton(
               onPressed: () {
                 _fetchDestinationCoordinates();
+
+                // Find a way to ensure that the destination Longitude and Latitude are not null at this point.
+
+                print("Works $_destinationLatitude");
+                print("Works $_destinationLongitude");
+
                 if (_currentLocation != null &&
                     _destinationLatitude != null &&
                     _destinationLongitude != null) {
@@ -147,3 +153,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+// new errors came up.
+
+// You have to press the button twice. Error is noticeable from developer.log
+// 
