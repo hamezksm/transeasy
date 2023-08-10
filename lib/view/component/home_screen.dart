@@ -22,7 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   double? _destinationLongitude;
   List<LatLng> routePoints = [];
 
-
   @override
   void initState() {
     super.initState();
@@ -30,9 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _fetchDestinationCoordinates() async {
-     
-
-
     // Fetch Destination coordinates using google Geocoding API
     if (_selectedDestination != null) {
       const apiKey =
@@ -90,8 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _fetchCurrentLocationAndPermissions() async {
-    // Fetch destination coordinates using Google Geocoding API
-
     // Fetch current location and permissions
     bool serviceEnabled;
     PermissionStatus permissionGranted;
