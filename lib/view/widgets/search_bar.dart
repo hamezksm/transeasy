@@ -7,12 +7,12 @@ class SearchWidget extends StatefulWidget {
   const SearchWidget({Key? key, this.onDestinationSelected}) : super(key: key);
 
   @override
-  _SearchWidgetState createState() => _SearchWidgetState();
+  State<SearchWidget> createState() => _SearchWidgetState();
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
   final DataService _dataService = DataService();
-  Set<String> _destinationSet = {}; // Use Set to store unique destinations
+  final Set<String> _destinationSet = {}; // Use Set to store unique destinations
   String? _selectedDestination;
 
   @override

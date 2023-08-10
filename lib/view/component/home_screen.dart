@@ -5,7 +5,6 @@ import 'directions_screen.dart'; // Import your MapScreen
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'dart:io';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -24,14 +23,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchCurrentLocation();
+    _fetchDestinationCoordinates();
+    _fetchCurrentLocationAndPermissions();
   }
 
-  Future<void> _fetchCurrentLocation() async {
-    // Fetch destination coordinates using Google Geocoding API
+  void _fetchDestinationCoordinates() async {
+    // Fetch Destination coordinates using google Geocoding API
     if (_selectedDestination != null) {
       const apiKey =
-          'AIzaSyDJuvvHiJHEqEQVWHAXklkxk8_ntygh8U0'; // Replace with your actual API key
+          'AIzaSyAHE--fekmSMszu_Swf7cnjl-jH74RyoQw'; // Replace with actual API key
       final apiUrl =
           'https://maps.googleapis.com/maps/api/geocode/json?address=$_selectedDestination&key=$apiKey';
 
@@ -45,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _destinationLatitude = location['lat'];
             _destinationLongitude = location['lng'];
           });
+
           developer.log(
             'log me',
             name: 'my.app.category',
@@ -61,23 +62,27 @@ class _HomeScreenState extends State<HomeScreen> {
         print('Much larger error');
       }
     }
+  }
+
+  Future<void> _fetchCurrentLocationAndPermissions() async {
+    // Fetch destination coordinates using Google Geocoding API
 
     // Fetch current location and permissions
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
 
-    _serviceEnabled = await loc.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await loc.requestService();
-      if (!_serviceEnabled) {
+    serviceEnabled = await loc.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await loc.requestService();
+      if (!serviceEnabled) {
         return;
       }
     }
 
-    _permissionGranted = await loc.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await loc.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
+    permissionGranted = await loc.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await loc.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
         return;
       }
     }
@@ -111,6 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             FilledButton(
               onPressed: () {
+                _fetchDestinationCoordinates();
                 if (_currentLocation != null &&
                     _destinationLatitude != null &&
                     _destinationLongitude != null) {
