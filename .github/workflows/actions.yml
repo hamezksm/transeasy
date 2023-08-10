@@ -8,7 +8,7 @@ name: "build and release"
 jobs:
     build:
       name: Build & Release
-      runs-on: windows-latest
+      runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-java@v1
@@ -18,10 +18,10 @@ jobs:
           with:
             channel: 'stable'
         - run: flutter pub get
-        - run: flutter build apk
+        - run: flutter build appbundle --release
         - uses: ncipollo/release-action@v1
           with:
-            artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+            artifacts: "build/app/outputs/flutter-apk/app-release.aab"
             tag: Release
             token: ${{ secrets.TOKEN }}
 
