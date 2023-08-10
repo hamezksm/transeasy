@@ -9,12 +9,13 @@ class MapScreen extends StatelessWidget {
   // Add the destination's latitude and longitude as constructor parameters
   final double destinationLatitude; // Change this
   final double destinationLongitude; // Change this
-
-  const MapScreen({super.key, 
+  final List<LatLng> routePoints;
+  
+  const MapScreen({
+    super.key,
     required this.currentLocation,
     required this.destination,
-    required this.destinationLatitude,
-    required this.destinationLongitude,
+    required this.routePoints, required this.destinationLatitude, required this.destinationLongitude,
   });
 
   @override
@@ -26,22 +27,23 @@ class MapScreen extends StatelessWidget {
         ),
         body: GoogleMap(
           initialCameraPosition: CameraPosition(
-            target: LatLng(currentLocation.latitude!, currentLocation.longitude!),
+            target:
+                LatLng(currentLocation.latitude!, currentLocation.longitude!),
             zoom: 15,
           ),
           markers: {
             Marker(
-              markerId: const MarkerId('currentLocation'),
+              markerId: MarkerId('currentLocation'),
               position: LatLng(
                 currentLocation.latitude!,
                 currentLocation.longitude!,
               ),
-              infoWindow: const InfoWindow(title: 'Current Location'),
+              infoWindow: InfoWindow(title: 'Current Location'),
             ),
             Marker(
               markerId: const MarkerId('destination'),
               position: LatLng(destinationLatitude, destinationLongitude),
-              infoWindow: const InfoWindow(title: 'Destination'),
+              infoWindow: InfoWindow(title: 'Destination'),
             ),
           },
           polylines: {
@@ -49,10 +51,9 @@ class MapScreen extends StatelessWidget {
               polylineId: const PolylineId('walkingRoute'),
               color: Colors.blue,
               width: 5,
-              points: [
-                LatLng(currentLocation.latitude!, currentLocation.longitude!),
-                LatLng(destinationLatitude, destinationLongitude),
-              ],
+              points: 
+                routePoints,
+              
             ),
           },
         ),

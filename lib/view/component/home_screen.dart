@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:trans_e/view/widgets/search_bar.dart';
 import 'directions_screen.dart'; // Import your MapScreen
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:developer' as developer;
+import 'package:google_maps_polyline/google_maps_polyline.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,19 +20,23 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _selectedDestination;
   double? _destinationLatitude;
   double? _destinationLongitude;
+  List<LatLng> routePoints = [];
+
 
   @override
   void initState() {
     super.initState();
-    _fetchDestinationCoordinates();
     _fetchCurrentLocationAndPermissions();
   }
 
   void _fetchDestinationCoordinates() async {
+     
+
+
     // Fetch Destination coordinates using google Geocoding API
     if (_selectedDestination != null) {
       const apiKey =
-          'AIzaSyAHE--fekmSMszu_Swf7cnjl-jH74RyoQw'; // Replace with actual API key
+          'AIzaSyDJuvvHiJHEqEQVWHAXklkxk8_ntygh8U0'; // Replace with actual API key
       final apiUrl =
           'https://maps.googleapis.com/maps/api/geocode/json?address=$_selectedDestination&key=$apiKey';
 
@@ -46,13 +51,33 @@ class _HomeScreenState extends State<HomeScreen> {
             _destinationLongitude = location['lng'];
           });
 
-          developer.log(
-            'log me',
-            // name: 'my.app.category',
-            error: jsonDecode(data),
-          );
-          // stderr.writeIn('print');
-          print(response.body);
+          // Fetch detailed route using Google Directions API
+          final directionsResponse = await http.get(Uri.parse(
+            'https://maps.googleapis.com/maps/api/directions/json'
+            '?origin=${_currentLocation!.latitude},${_currentLocation!.longitude}'
+            '&destination=$_destinationLatitude,$_destinationLongitude'
+            '&key=$apiKey',
+          ));
+
+          if (directionsResponse.statusCode == 200) {
+            final directionsData = json.decode(directionsResponse.body);
+            if (directionsData['status'] == 'OK') {
+              final routes = directionsData['routes'];
+              if (routes.isNotEmpty) {
+                final overviewPolyline = routes[0]['overview_polyline'];
+                final points = overviewPolyline['points'];
+
+                // Decode the polyline points using GoogleMapsPolyline
+                final polylinePoints =
+                    GoogleMapsPolyline().decodePolyline(points);
+
+                // Convert the List<LatLng> to List<LatLng>
+                routePoints = polylinePoints
+                    .map((point) => LatLng(point.latitude!, point.longitude!))
+                    .toList();
+              }
+            }
+          }
         } else {
           // Handle API error
           print('Big error');
@@ -86,9 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
     }
-
     _currentLocation = await loc.getLocation();
-    // setState(() {});
+    setState(() {});
+    _fetchDestinationCoordinates();
   }
 
   @override
@@ -115,8 +140,9 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 10,
             ),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 _fetchDestinationCoordinates();
+                _currentLocation;
 
                 // Find a way to ensure that the destination Longitude and Latitude are not null at this point.
 
@@ -134,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         destination: _selectedDestination!,
                         destinationLatitude: _destinationLatitude!,
                         destinationLongitude: _destinationLongitude!,
+                        routePoints: routePoints,
                       ),
                     ),
                   );
